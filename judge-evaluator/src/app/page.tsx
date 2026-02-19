@@ -155,6 +155,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("overview");
   const [filterJudge, setFilterJudge] = useState("All");
   const [filterCat, setFilterCat] = useState("All");
+  const [filterModels, setFilterModels] = useState<Set<string>>(new Set()); // empty = all
   const [sortBy, setSortBy] = useState("mean_desc");
   const [showUpload, setShowUpload] = useState(false);
   // Question comparison tab state
@@ -167,11 +168,22 @@ export default function App() {
 
   const judges = useMemo(() => ["All", ...Array.from(new Set(data.map(d => d.judgeModel)))], [data]);
   const categories = useMemo(() => ["All", ...Array.from(new Set(data.map(d => d.questionCategory)))], [data]);
+  const allModels = useMemo(() => Array.from(new Set(data.map(d => d.testModel))).sort(), [data]);
+
+  const toggleModel = (model: string) => {
+    setFilterModels(prev => {
+      const next = new Set(prev);
+      if (next.has(model)) next.delete(model); else next.add(model);
+      return next;
+    });
+    setSelectedQ(null);
+  };
 
   const filtered = useMemo(() => data.filter(d =>
     (filterJudge === "All" || d.judgeModel === filterJudge) &&
-    (filterCat === "All" || d.questionCategory === filterCat)
-  ), [data, filterJudge, filterCat]);
+    (filterCat === "All" || d.questionCategory === filterCat) &&
+    (filterModels.size === 0 || filterModels.has(d.testModel))
+  ), [data, filterJudge, filterCat, filterModels]);
 
   const modelStats = useMemo(() => {
     const models = Array.from(new Set(data.map(d => d.testModel)));
@@ -352,7 +364,7 @@ export default function App() {
         </div>
 
         {/* Filters */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap", alignItems: "flex-start" }}>
           <div>
             <label style={{ fontSize: 10, color: "#64748b", letterSpacing: 2, textTransform: "uppercase", display: "block", marginBottom: 4 }}>Judge Model</label>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -378,8 +390,40 @@ export default function App() {
               {categories.map(c => <option key={c}>{c}</option>)}
             </select>
           </div>
-          <div style={{ marginLeft: "auto", fontSize: 12, color: "#334155" }}>
-            Showing <span style={{ color: "#60a5fa", fontWeight: 700 }}>{filtered.length}</span> records
+          <div style={{ flex: "1 1 100%", borderTop: "1px solid #1e293b", paddingTop: 14, marginTop: 2 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+              <label style={{ fontSize: 10, color: "#64748b", letterSpacing: 2, textTransform: "uppercase" }}>Test Models</label>
+              {filterModels.size > 0 && (
+                <button
+                  onClick={() => { setFilterModels(new Set()); setSelectedQ(null); }}
+                  style={{ fontSize: 10, color: "#f87171", background: "#f8717118", border: "1px solid #f8717133", borderRadius: 20, padding: "1px 8px", cursor: "pointer", fontFamily: "inherit" }}
+                >
+                  clear ({filterModels.size} hidden)
+                </button>
+              )}
+              <span style={{ marginLeft: "auto", fontSize: 11, color: "#334155" }}>
+                Showing <span style={{ color: "#60a5fa", fontWeight: 700 }}>{filtered.length}</span> records
+              </span>
+            </div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {allModels.map(m => {
+                const active = filterModels.size === 0 || filterModels.has(m);
+                const color = getModelColor(m);
+                return (
+                  <button key={m} onClick={() => toggleModel(m)} style={{
+                    padding: "4px 10px", borderRadius: 5, border: "1px solid",
+                    borderColor: active ? color + "88" : "#1e293b",
+                    background: active ? color + "18" : "transparent",
+                    color: active ? color : "#334155",
+                    fontSize: 11, cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
+                    display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s ease",
+                  }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: active ? color : "#334155", flexShrink: 0 }} />
+                    {m}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
