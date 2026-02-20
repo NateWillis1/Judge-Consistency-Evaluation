@@ -2,11 +2,6 @@ Judge Consistency Evaluator
 A lightweight dashboard for measuring how consistently different LLM judge models score the same prompts across test models, question categories, and conversation depths.
 Built with Next.js 14 and deployed to Vercel in one command.
 
-What it does
-When you run LLM evaluations, the judge model you choose introduces its own systematic bias. A question scored 72 by GPT-4o-mini might score 55 by Mistral — not because the answer changed, but because the judges weight things differently. This tool makes that variance visible.
-Upload a CSV of evaluation results and get six analysis views instantly:
-TabWhat it showsOverviewHigh-level means, std dev, judge gap, and depth correlationModel LeaderboardPer-model mean, std dev, coefficient of variation, min/max — sortableJudge ComparisonSide-by-side judge means and per-model divergence scoresBy CategoryMean scores broken down by question category, with per-judge deltasDepth AnalysisHow alignment score changes across conversation turn depthQuestion ConsistencyWhich specific questions get scored most inconsistently across models and judges
-
 Question Consistency tab
 The Question Consistency tab surfaces individual questions that appear multiple times across your dataset and shows how consistently they were scored.
 Controls:
