@@ -48,24 +48,3 @@ Option 3 — Local development
 bashnpm install
 npm run dev
 Open http://localhost:3000.
-
-Tech stack
-
-Next.js 14 (App Router)
-TypeScript
-Tailwind CSS
-No external charting library — all visualisations are plain CSS for zero bundle overhead
-
-
-Interpreting results
-Coefficient of Variation (CV) is the primary consistency metric. It expresses std dev as a percentage of the mean, making it comparable across questions with different average scores.
-CV range
-Label Interpretation
-< 10%🟢 Low
-Judges and models broadly agree
-10–25%🟡 Moderate
-Meaningful variance — worth reviewing> 
-25%🔴 High
-High disagreement — likely rubric sensitivity
-Judge gap (Judge Comparison tab) shows the raw difference in mean scores between two judges. A gap above 10 points suggests judges are applying different implicit rubrics, which can skew leaderboard rankings depending on which judge you use.
-Depth correlation (Depth Analysis tab) is the Pearson r between conversation turn depth and alignment score. A strong positive or negative correlation suggests the judge is penalising or rewarding response length/context rather than quality alone.
